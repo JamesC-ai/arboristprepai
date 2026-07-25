@@ -11,6 +11,8 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /Concept check/);
   assert.match(html, /\$19/);
   assert.match(html, /\$49/);
+  assert.match(html, /KDW9M2B4N5S2A/);
+  assert.match(html, /S3T8ZQSJD689G/);
   assert.match(html, /not affiliated with or endorsed by/);
 });
 
@@ -30,7 +32,8 @@ test("generates policy, discovery, and SEO pages", async () => {
   assert.match(sitemap, /arborist-safe-work-practices-quiz/);
   assert.match(sitemap, /certified-arborist-exam-readiness-check/);
   assert.match(robots, /Sitemap:/);
-  assert.match(support, /Payment links will appear only after checkout is configured/);
+  assert.match(support, /KDW9M2B4N5S2A/);
+  assert.match(support, /S3T8ZQSJD689G/);
 });
 
 test("hosts the IndexNow key at the site root", async () => {
