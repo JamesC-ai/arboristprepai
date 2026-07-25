@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ArboristPrepAI - Certified Arborist study diagnostic</title>
+    <meta
+      name="description"
+      content="Run an independent Certified Arborist readiness diagnostic and build a focused weekly study plan in your browser."
+    />
+    <link rel="canonical" href="https://arborist.pagecheckai.com/" />
+    <meta property="og:title" content="ArboristPrepAI" />
+    <meta property="og:description" content="Find weak domains and build a practical arborist exam study plan." />
+    <meta property="og:image" content="https://arborist.pagecheckai.com/arborist-field.jpg" />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="ArboristPrepAI home">
+        <span class="brand-mark">A</span>
+        <span>ArboristPrepAI</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="#diagnostic">Diagnostic</a>
+        <a href="#packs">Study packs</a>
+        <a href="/support.html">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro-band">
+        <div class="intro-copy">
+          <p class="eyebrow">Independent certification prep</p>
+          <h1>Turn weak arborist domains into a weekly study plan.</h1>
+          <p class="lede">
+            Set your exam date, rate ten knowledge domains, and complete a short original concept check. Your plan stays in this browser.
+          </p>
+          <a class="primary-button" href="#diagnostic">Start readiness check</a>
+        </div>
+        <figure class="field-visual">
+          <img src="/arborist-field.jpg" alt="A professional arborist secured in a mature tree canopy" />
+          <figcaption>
+            Field image: TreeMinion15,
+            <a href="https://commons.wikimedia.org/wiki/File:Tree_Climbing_Arborist.jpg">CC BY-SA 4.0</a>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="workspace" id="diagnostic">
+        <form class="panel setup-panel" id="planForm">
+          <div class="panel-heading">
+            <p class="step-label">01</p>
+            <div>
+              <h2>Study setup</h2>
+              <p id="dateStatus">Choose a target date.</p>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>
+              Target exam date
+              <input id="examDate" type="date" required />
+            </label>
+            <label>
+              Study hours per week
+              <input id="weeklyHours" type="number" min="2" max="30" value="6" required />
+            </label>
+          </div>
+
+          <label>
+            Preferred review style
+            <select id="studyStyle">
+              <option value="mixed">Mixed: reading, recall, scenarios</option>
+              <option value="field">Field scenarios first</option>
+              <option value="flashcards">Recall and flashcards first</option>
+            </select>
+          </label>
+
+          <fieldset class="domain-fieldset">
+            <legend>Confidence by domain</legend>
+            <div class="domain-grid" id="domainGrid">
+              <label>Tree biology <input data-domain="Tree biology" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Identification & selection <input data-domain="Identification and selection" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Soil management <input data-domain="Soil management" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Installation & establishment <input data-domain="Installation and establishment" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Pruning <input data-domain="Pruning" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Diagnosis & treatment <input data-domain="Diagnosis and treatment" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Trees & construction <input data-domain="Trees and construction" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Tree risk <input data-domain="Tree risk" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Safe work practices <input data-domain="Safe work practices" type="range" min="1" max="5" value="3" /><output>3</output></label>
+              <label>Urban forestry <input data-domain="Urban forestry" type="range" min="1" max="5" value="3" /><output>3</output></label>
+            </div>
+          </fieldset>
+
+          <button class="primary-button full-width" type="submit">Build study plan</button>
+        </form>
+
+        <section class="panel quiz-panel" aria-labelledby="quizTitle">
+          <div class="panel-heading">
+            <p class="step-label">02</p>
+            <div>
+              <h2 id="quizTitle">Concept check</h2>
+              <p id="quizProgress">Question 1 of 12</p>
+            </div>
+          </div>
+          <form id="quizForm">
+            <fieldset id="questionFieldset">
+              <legend id="questionText"></legend>
+              <div class="answer-list" id="answerList"></div>
+            </fieldset>
+            <div class="quiz-actions">
+              <button class="secondary-button" id="checkAnswer" type="submit">Check answer</button>
+              <button class="secondary-button" id="nextQuestion" type="button" disabled>Next</button>
+            </div>
+          </form>
+          <div class="answer-feedback" id="answerFeedback" aria-live="polite">Select one answer.</div>
+        </section>
+
+        <section class="panel results-panel" aria-labelledby="resultsTitle">
+          <div class="panel-heading">
+            <p class="step-label">03</p>
+            <div>
+              <h2 id="resultsTitle">Readiness plan</h2>
+              <p>Updates from your setup and concept check.</p>
+            </div>
+          </div>
+
+          <div class="readiness-summary">
+            <div class="score-box">
+              <strong id="readinessScore">60</strong>
+              <span>readiness</span>
+            </div>
+            <div>
+              <p class="result-label">Priority domains</p>
+              <ol id="priorityList">
+                <li>Complete the setup to rank domains.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="plan-output" id="planOutput">
+            <article>
+              <span>Week 1</span>
+              <h3>Baseline</h3>
+              <p>Complete the concept check and mark unfamiliar terms for verification.</p>
+            </article>
+          </div>
+
+          <div class="result-actions">
+            <button class="secondary-button" id="copyPlan" type="button">Copy plan</button>
+            <button class="secondary-button" id="downloadPlan" type="button">Download</button>
+            <a class="secondary-button" id="emailPlan" href="mailto:support@pagecheckai.com?subject=ArboristPrepAI%20plan">Email plan</a>
+          </div>
+        </section>
+      </section>
+
+      <section class="offer-band" id="packs">
+        <div>
+          <p class="eyebrow">Launch pricing</p>
+          <h2>Keep the free diagnostic. Add review only when it saves study time.</h2>
+        </div>
+        <article>
+          <span class="price">$19</span>
+          <h3>Study Sprint Pack</h3>
+          <p>Four-week domain plan, printable review tracker, and original recall prompts.</p>
+          <a href="mailto:support@pagecheckai.com?subject=ArboristPrepAI%20%2419%20launch%20notice">Request launch notice</a>
+        </article>
+        <article>
+          <span class="price">$49</span>
+          <h3>Readiness Review</h3>
+          <p>One plan review with weak-domain priorities and a revised final-week checklist.</p>
+          <a href="mailto:support@pagecheckai.com?subject=ArboristPrepAI%20%2449%20launch%20notice">Request launch notice</a>
+        </article>
+      </section>
+
+      <section class="boundary-band">
+        <div>
+          <p class="eyebrow">Accuracy boundary</p>
+          <h2>Original practice, official sources.</h2>
+        </div>
+        <p>
+          ArboristPrepAI is independent and is not affiliated with or endorsed by the International Society of Arboriculture (ISA).
+          It does not use recalled or official exam questions. Verify current eligibility, domains, policies, and technical guidance
+          with the <a href="https://www.isa-arbor.com/Credentials/Types-of-Credentials/ISA-Certified-Arborist">official credential page</a>,
+          current study materials, and applicable safety standards.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <span>ArboristPrepAI</span>
+      <span><a href="/privacy.html">Privacy</a> <a href="/terms.html">Terms</a> <a href="/support.html">Support</a> <a href="https://tools.pagecheckai.com">More tools</a></span>
+    </footer>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
