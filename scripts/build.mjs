@@ -82,6 +82,46 @@ const pages = [
     intent: "Candidates deciding whether to review broadly or focus on a few weak domains.",
     actions: ["Rate confidence honestly.", "Complete original concept checks.", "Rank weak domains.", "Confirm eligibility and policies with official sources."],
   },
+  {
+    slug: "arborist-plant-identification-study-guide",
+    title: "Arborist plant identification study guide",
+    description: "Build a plant identification review process around observable features, seasonal limits, site context, and verified regional references.",
+    headline: "Make plant identification practice more systematic.",
+    intent: "Candidates who need a repeatable way to study tree identification without memorizing one narrow photo set.",
+    actions: ["Start with leaf arrangement and form.", "Compare bark, buds, fruit, and habit.", "Record seasonal uncertainty.", "Verify species with current regional references."],
+  },
+  {
+    slug: "arborist-diagnosis-treatment-study-guide",
+    title: "Arborist diagnosis and treatment study guide",
+    description: "Review diagnosis as an evidence process that separates symptoms, signs, site history, likely causes, testing, and treatment limits.",
+    headline: "Practice diagnosis before jumping to treatment.",
+    intent: "Candidates strengthening the reasoning used for tree disorders, pests, abiotic stress, and responsible recommendations.",
+    actions: ["Describe symptoms and signs separately.", "Gather site and management history.", "Rank plausible causes.", "Verify diagnosis and treatment guidance before field use."],
+  },
+  {
+    slug: "tree-installation-establishment-study-guide",
+    title: "Tree installation and establishment study guide",
+    description: "Review species selection, root flare, planting depth, root defects, backfill, mulch, watering, staking, and establishment monitoring.",
+    headline: "Connect tree installation details to establishment outcomes.",
+    intent: "Candidates reviewing why planting-site assessment and early aftercare affect long-term tree performance.",
+    actions: ["Match the tree to site constraints.", "Inspect roots and locate the flare.", "Review planting and support decisions.", "Plan watering and follow-up observations."],
+  },
+  {
+    slug: "urban-forestry-study-guide",
+    title: "Urban forestry study guide for arborist candidates",
+    description: "Organize urban forestry review around inventory, canopy goals, species diversity, budgets, community needs, maintenance, and risk priorities.",
+    headline: "Place individual tree decisions inside an urban forest plan.",
+    intent: "Candidates who need to connect field arboriculture with municipal planning, public benefits, constraints, and long-term management.",
+    actions: ["Define the inventory question.", "Connect data to canopy and service goals.", "Balance diversity, maintenance, and risk.", "Review communication and implementation constraints."],
+  },
+  {
+    slug: "tree-protection-during-construction-study-guide",
+    title: "Tree protection during construction study guide",
+    description: "Review tree protection zones, root and soil impacts, grade changes, access routes, monitoring, communication, and documentation around construction.",
+    headline: "Study construction impacts before damage reaches the tree.",
+    intent: "Candidates reviewing how planning, site controls, monitoring, and communication reduce avoidable construction damage.",
+    actions: ["Identify retained trees and site constraints.", "Map likely root and soil impacts.", "Plan protection and access boundaries.", "Document changes and verify current standards."],
+  },
 ];
 
 function escapeHtml(value) {

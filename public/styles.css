@@ -447,6 +447,7 @@ output {
 }
 
 .offer-band,
+.guide-band,
 .boundary-band {
   display: grid;
   grid-template-columns: minmax(280px, 1.2fr) repeat(2, minmax(260px, 0.8fr));
@@ -479,6 +480,33 @@ output {
 
 .offer-band p {
   color: var(--muted);
+}
+
+.guide-band {
+  grid-template-columns: minmax(260px, 0.72fr) minmax(480px, 1.28fr);
+  align-items: center;
+  background: white;
+  border-top: 1px solid var(--line);
+}
+
+.guide-band h2 {
+  margin: 6px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.85rem;
+}
+
+.guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.guide-links a {
+  padding: 8px 10px;
+  color: var(--forest);
+  border-bottom: 2px solid var(--leaf);
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .price {
@@ -556,6 +584,7 @@ footer span:last-child {
   .intro-band,
   .workspace,
   .offer-band,
+  .guide-band,
   .boundary-band {
     grid-template-columns: 1fr;
   }
@@ -590,6 +619,7 @@ footer span:last-child {
   }
 
   .offer-band,
+  .guide-band,
   .boundary-band {
     padding: 36px 22px;
   }

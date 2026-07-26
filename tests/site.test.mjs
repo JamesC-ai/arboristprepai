@@ -3,6 +3,23 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const seoRoutes = [
+  "certified-arborist-study-plan",
+  "arborist-exam-practice-questions",
+  "arborist-exam-study-schedule",
+  "tree-risk-assessment-study-guide",
+  "arborist-pruning-practice-quiz",
+  "arborist-soil-management-review",
+  "arborist-tree-biology-study-guide",
+  "arborist-safe-work-practices-quiz",
+  "arborist-exam-flashcard-plan",
+  "certified-arborist-exam-readiness-check",
+  "arborist-plant-identification-study-guide",
+  "arborist-diagnosis-treatment-study-guide",
+  "tree-installation-establishment-study-guide",
+  "urban-forestry-study-guide",
+  "tree-protection-during-construction-study-guide",
+];
 
 test("ships the study diagnostic and launch offers", async () => {
   const html = await read("dist/index.html");
@@ -14,6 +31,8 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /KDW9M2B4N5S2A/);
   assert.match(html, /S3T8ZQSJD689G/);
   assert.match(html, /not affiliated with or endorsed by/);
+  assert.match(html, /Plant identification/);
+  assert.match(html, /Construction protection/);
 });
 
 test("runs locally without transmitting diagnostic answers", async () => {
@@ -28,12 +47,25 @@ test("generates policy, discovery, and SEO pages", async () => {
   const sitemap = await read("dist/sitemap.xml");
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
-  assert.match(sitemap, /certified-arborist-study-plan/);
-  assert.match(sitemap, /arborist-safe-work-practices-quiz/);
-  assert.match(sitemap, /certified-arborist-exam-readiness-check/);
+  const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  assert.equal(sitemapUrls.length, 19);
+  for (const route of seoRoutes) {
+    assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
+  }
   assert.match(robots, /Sitemap:/);
   assert.match(support, /KDW9M2B4N5S2A/);
   assert.match(support, /S3T8ZQSJD689G/);
+});
+
+test("renders all study pages with independent-use boundaries", async () => {
+  for (const route of seoRoutes) {
+    const html = await read(`dist/${route}/index.html`);
+    assert.match(html, /ArboristPrepAI/);
+    assert.match(html, /Run the free diagnostic/);
+    assert.match(html, /not affiliated with or endorsed by ISA/);
+    assert.match(html, /does not reproduce official or recalled exam questions/);
+    assert.match(html, /does not guarantee a passing result/);
+  }
 });
 
 test("hosts the IndexNow key at the site root", async () => {
