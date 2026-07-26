@@ -19,6 +19,16 @@ const seoRoutes = [
   "tree-installation-establishment-study-guide",
   "urban-forestry-study-guide",
   "tree-protection-during-construction-study-guide",
+  "arborist-pest-identification-study-guide",
+  "abiotic-tree-stress-study-guide",
+  "arborist-cabling-bracing-study-guide",
+  "tree-appraisal-basics-study-guide",
+  "arborist-watering-irrigation-study-guide",
+  "utility-arboriculture-safety-study-guide",
+  "tree-preservation-plan-study-guide",
+  "arborist-client-communication-scenario-quiz",
+  "tree-inventory-study-guide",
+  "arborist-emergency-storm-damage-study-guide",
 ];
 
 test("ships the study diagnostic and launch offers", async () => {
@@ -33,6 +43,8 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /not affiliated with or endorsed by/);
   assert.match(html, /Plant identification/);
   assert.match(html, /Construction protection/);
+  assert.match(html, /Pest identification/);
+  assert.match(html, /Storm damage/);
 });
 
 test("runs locally without transmitting diagnostic answers", async () => {
@@ -48,7 +60,7 @@ test("generates policy, discovery, and SEO pages", async () => {
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(sitemapUrls.length, 19);
+  assert.equal(sitemapUrls.length, 29);
   for (const route of seoRoutes) {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
