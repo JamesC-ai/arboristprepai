@@ -29,6 +29,16 @@ const seoRoutes = [
   "arborist-client-communication-scenario-quiz",
   "tree-inventory-study-guide",
   "arborist-emergency-storm-damage-study-guide",
+  "arborist-tree-disease-study-guide",
+  "arborist-roots-and-soil-compaction-review",
+  "arborist-mulching-study-guide",
+  "arborist-fertilization-study-guide",
+  "arborist-tree-selection-study-guide",
+  "arborist-plant-health-care-study-guide",
+  "arborist-equipment-safety-study-guide",
+  "arborist-aerial-lift-safety-study-guide",
+  "arborist-ethics-professional-practice-study-guide",
+  "arborist-final-week-review-checklist",
 ];
 
 test("ships the study diagnostic and launch offers", async () => {
@@ -60,7 +70,7 @@ test("generates policy, discovery, and SEO pages", async () => {
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(sitemapUrls.length, 29);
+  assert.equal(sitemapUrls.length, 39);
   for (const route of seoRoutes) {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
@@ -78,6 +88,21 @@ test("renders all study pages with independent-use boundaries", async () => {
     assert.match(html, /does not reproduce official or recalled exam questions/);
     assert.match(html, /does not guarantee a passing result/);
   }
+});
+
+test("new study guides avoid unsafe instruction and guarantees", async () => {
+  const disease = await read("dist/arborist-tree-disease-study-guide/index.html");
+  const lift = await read("dist/arborist-aerial-lift-safety-study-guide/index.html");
+  const ethics = await read("dist/arborist-ethics-professional-practice-study-guide/index.html");
+  const finalWeek = await read("dist/arborist-final-week-review-checklist/index.html");
+  const combined = `${disease}\n${lift}\n${ethics}\n${finalWeek}`;
+
+  assert.match(combined, /not affiliated with or endorsed by ISA/);
+  assert.match(combined, /does not reproduce official or recalled exam questions/);
+  assert.match(combined, /does not guarantee a passing result/);
+  assert.match(combined, /qualified training, employer procedures, and current regulations/);
+  assert.match(combined, /Avoid guarantees about tree survival, safety, legal results, or exam outcomes/);
+  assert.doesNotMatch(combined.toLowerCase(), /official exam questions|recalled exam answers|guaranteed pass|guaranteed safe/);
 });
 
 test("hosts the IndexNow key at the site root", async () => {
