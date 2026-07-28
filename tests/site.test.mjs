@@ -59,6 +59,16 @@ const seoRoutes = [
   "arborist-lightning-protection-study-guide",
   "arborist-tree-inventory-data-checklist",
   "arborist-client-report-review-checklist",
+  "arborist-tree-support-systems-study-guide",
+  "arborist-invasive-species-study-guide",
+  "arborist-nursery-stock-selection-study-guide",
+  "arborist-tree-wound-response-study-guide",
+  "arborist-chainsaw-safety-concept-review",
+  "arborist-planting-specification-review",
+  "arborist-pesticide-label-study-boundary",
+  "arborist-tree-mapping-study-guide",
+  "arborist-tree-benefits-communication-guide",
+  "arborist-continuing-education-plan",
 ];
 
 test("ships the study diagnostic and launch offers", async () => {
@@ -92,7 +102,7 @@ test("generates policy, discovery, and SEO pages", async () => {
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(sitemapUrls.length, 59);
+  assert.equal(sitemapUrls.length, 69);
   for (const route of seoRoutes) {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
@@ -162,6 +172,23 @@ test("second-pass field study pages keep referral and no-guarantee boundaries", 
   assert.match(utility, /Avoid any instruction to approach, prune, or work near energized conductors/);
   assert.match(lightning, /Avoid safety guarantees, wiring guidance, or engineering advice/);
   assert.match(report, /Remove guarantees about safety, survival, legal results, compliance, or exam outcomes/);
+  assert.doesNotMatch(combined.toLowerCase(), /guaranteed pass|guaranteed safe|official exam questions|recalled exam answers/);
+});
+
+test("third-pass arborist study pages keep safety, legal, and credential boundaries", async () => {
+  const support = await read("dist/arborist-tree-support-systems-study-guide/index.html");
+  const pesticide = await read("dist/arborist-pesticide-label-study-boundary/index.html");
+  const chainsaw = await read("dist/arborist-chainsaw-safety-concept-review/index.html");
+  const education = await read("dist/arborist-continuing-education-plan/index.html");
+  const combined = `${support}\n${pesticide}\n${chainsaw}\n${education}`;
+
+  assert.match(combined, /not affiliated with or endorsed by ISA/);
+  assert.match(combined, /does not reproduce official or recalled exam questions/);
+  assert.match(combined, /does not guarantee a passing result/);
+  assert.match(support, /qualified supervision before field use/);
+  assert.match(pesticide, /Avoid dosage, mixing, timing, or application instructions/);
+  assert.match(chainsaw, /without procedural instruction/);
+  assert.match(education, /Avoid treating the plan as credential approval or employer authorization/);
   assert.doesNotMatch(combined.toLowerCase(), /guaranteed pass|guaranteed safe|official exam questions|recalled exam answers/);
 });
 
