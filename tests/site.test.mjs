@@ -49,6 +49,16 @@ const seoRoutes = [
   "arborist-municipal-tree-policy-study-guide",
   "arborist-tree-ordinance-review-checklist",
   "arborist-exam-day-logistics-checklist",
+  "arborist-tree-identification-field-notes",
+  "arborist-pruning-cuts-study-guide",
+  "arborist-soil-texture-study-guide",
+  "arborist-tree-risk-language-practice",
+  "arborist-root-collar-study-guide",
+  "arborist-construction-protection-scenario-quiz",
+  "arborist-utility-line-clearance-study-guide",
+  "arborist-lightning-protection-study-guide",
+  "arborist-tree-inventory-data-checklist",
+  "arborist-client-report-review-checklist",
 ];
 
 test("ships the study diagnostic and launch offers", async () => {
@@ -82,7 +92,7 @@ test("generates policy, discovery, and SEO pages", async () => {
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(sitemapUrls.length, 49);
+  assert.equal(sitemapUrls.length, 59);
   for (const route of seoRoutes) {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
@@ -133,6 +143,27 @@ test("new advanced study pages keep safety, legal, and exam boundaries", async (
   assert.match(logistics, /Avoid treating readiness scores as a guarantee/);
 }
 );
+
+test("second-pass field study pages keep referral and no-guarantee boundaries", async () => {
+  const pruning = await read("dist/arborist-pruning-cuts-study-guide/index.html");
+  const rootCollar = await read("dist/arborist-root-collar-study-guide/index.html");
+  const construction = await read("dist/arborist-construction-protection-scenario-quiz/index.html");
+  const utility = await read("dist/arborist-utility-line-clearance-study-guide/index.html");
+  const lightning = await read("dist/arborist-lightning-protection-study-guide/index.html");
+  const report = await read("dist/arborist-client-report-review-checklist/index.html");
+  const combined = `${pruning}\n${rootCollar}\n${construction}\n${utility}\n${lightning}\n${report}`;
+
+  assert.match(combined, /not affiliated with or endorsed by ISA/);
+  assert.match(combined, /does not reproduce official or recalled exam questions/);
+  assert.match(combined, /does not guarantee a passing result/);
+  assert.match(pruning, /Verify current standards and qualified supervision before field use/);
+  assert.match(rootCollar, /without qualified local review/);
+  assert.match(construction, /qualified professional direction before action/);
+  assert.match(utility, /Avoid any instruction to approach, prune, or work near energized conductors/);
+  assert.match(lightning, /Avoid safety guarantees, wiring guidance, or engineering advice/);
+  assert.match(report, /Remove guarantees about safety, survival, legal results, compliance, or exam outcomes/);
+  assert.doesNotMatch(combined.toLowerCase(), /guaranteed pass|guaranteed safe|official exam questions|recalled exam answers/);
+});
 
 test("hosts the IndexNow key at the site root", async () => {
   const key = await read("dist/e8126d98dca197b3cbcb885cacac678c.txt");
