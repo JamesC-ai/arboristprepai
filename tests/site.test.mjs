@@ -69,6 +69,16 @@ const seoRoutes = [
   "arborist-tree-mapping-study-guide",
   "arborist-tree-benefits-communication-guide",
   "arborist-continuing-education-plan",
+  "arborist-tree-risk-assessment-terms-study-guide",
+  "arborist-soil-amendment-study-boundary",
+  "arborist-municipal-tree-inventory-practice",
+  "arborist-tree-planting-aftercare-study-guide",
+  "arborist-root-pruning-concept-review",
+  "arborist-wildfire-defensible-space-study-guide",
+  "arborist-tree-failure-case-study-review",
+  "arborist-client-dispute-communication-guide",
+  "arborist-tree-species-selection-climate-study-guide",
+  "arborist-work-zone-traffic-control-concept-review",
 ];
 
 test("ships the study diagnostic and launch offers", async () => {
@@ -102,7 +112,7 @@ test("generates policy, discovery, and SEO pages", async () => {
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(sitemapUrls.length, 69);
+  assert.equal(sitemapUrls.length, 79);
   for (const route of seoRoutes) {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
@@ -189,6 +199,25 @@ test("third-pass arborist study pages keep safety, legal, and credential boundar
   assert.match(pesticide, /Avoid dosage, mixing, timing, or application instructions/);
   assert.match(chainsaw, /without procedural instruction/);
   assert.match(education, /Avoid treating the plan as credential approval or employer authorization/);
+  assert.doesNotMatch(combined.toLowerCase(), /guaranteed pass|guaranteed safe|official exam questions|recalled exam answers/);
+});
+
+test("fourth-pass arborist pages keep regulated field-work boundaries", async () => {
+  const risk = await read("dist/arborist-tree-risk-assessment-terms-study-guide/index.html");
+  const soil = await read("dist/arborist-soil-amendment-study-boundary/index.html");
+  const wildfire = await read("dist/arborist-wildfire-defensible-space-study-guide/index.html");
+  const dispute = await read("dist/arborist-client-dispute-communication-guide/index.html");
+  const traffic = await read("dist/arborist-work-zone-traffic-control-concept-review/index.html");
+  const combined = `${risk}\n${soil}\n${wildfire}\n${dispute}\n${traffic}`;
+
+  assert.match(combined, /not affiliated with or endorsed by ISA/);
+  assert.match(combined, /does not reproduce official or recalled exam questions/);
+  assert.match(combined, /does not guarantee a passing result/);
+  assert.match(risk, /Avoid guarantees about safety, legal results, or future tree condition/);
+  assert.match(soil, /Avoid dosage, product, legal, or outcome promises/);
+  assert.match(wildfire, /Avoid fire-safety, insurance, legal, or compliance guarantees/);
+  assert.match(dispute, /Avoid legal advice, blame assignment, refund decisions, or outcome promises/);
+  assert.match(traffic, /Avoid procedural instructions, compliance claims, or public-safety guarantees/);
   assert.doesNotMatch(combined.toLowerCase(), /guaranteed pass|guaranteed safe|official exam questions|recalled exam answers/);
 });
 
