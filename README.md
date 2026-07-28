@@ -2,9 +2,9 @@
 
 Independent browser-local study diagnostic and review planner for Certified Arborist candidates.
 
-The production build includes 35 original-study SEO pages, policy and support pages, a 39-URL sitemap, and IndexNow submission automation.
+The production build includes 45 original-study SEO pages, policy and support pages, a 49-URL sitemap, and IndexNow submission automation.
 
-Latest expansion: tree disease, roots and compaction, mulching, fertilization, tree selection, plant health care, equipment safety, aerial lift safety, ethics and professional practice, and final-week review checklists.
+Latest expansion: decay fungi, tree worker safety scenarios, IPM, young tree training, mature tree pruning, palm care, tree report writing, municipal tree policy, ordinance review, and exam-day logistics.
 
 ## Commands
 

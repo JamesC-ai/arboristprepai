@@ -39,6 +39,16 @@ const seoRoutes = [
   "arborist-aerial-lift-safety-study-guide",
   "arborist-ethics-professional-practice-study-guide",
   "arborist-final-week-review-checklist",
+  "arborist-decay-fungi-study-guide",
+  "arborist-tree-worker-safety-scenario-quiz",
+  "arborist-ipm-study-guide",
+  "arborist-young-tree-training-study-guide",
+  "arborist-mature-tree-pruning-study-guide",
+  "arborist-palm-care-study-guide",
+  "arborist-tree-report-writing-study-guide",
+  "arborist-municipal-tree-policy-study-guide",
+  "arborist-tree-ordinance-review-checklist",
+  "arborist-exam-day-logistics-checklist",
 ];
 
 test("ships the study diagnostic and launch offers", async () => {
@@ -55,6 +65,8 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /Construction protection/);
   assert.match(html, /Pest identification/);
   assert.match(html, /Storm damage/);
+  assert.match(html, /Decay fungi/);
+  assert.match(html, /Exam logistics/);
 });
 
 test("runs locally without transmitting diagnostic answers", async () => {
@@ -70,7 +82,7 @@ test("generates policy, discovery, and SEO pages", async () => {
   const robots = await read("dist/robots.txt");
   const support = await read("dist/support.html");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-  assert.equal(sitemapUrls.length, 39);
+  assert.equal(sitemapUrls.length, 49);
   for (const route of seoRoutes) {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
@@ -104,6 +116,23 @@ test("new study guides avoid unsafe instruction and guarantees", async () => {
   assert.match(combined, /Avoid guarantees about tree survival, safety, legal results, or exam outcomes/);
   assert.doesNotMatch(combined.toLowerCase(), /official exam questions|recalled exam answers|guaranteed pass|guaranteed safe/);
 });
+
+test("new advanced study pages keep safety, legal, and exam boundaries", async () => {
+  const safety = await read("dist/arborist-tree-worker-safety-scenario-quiz/index.html");
+  const ordinance = await read("dist/arborist-tree-ordinance-review-checklist/index.html");
+  const report = await read("dist/arborist-tree-report-writing-study-guide/index.html");
+  const logistics = await read("dist/arborist-exam-day-logistics-checklist/index.html");
+  const combined = `${safety}\n${ordinance}\n${report}\n${logistics}`;
+
+  assert.match(combined, /not affiliated with or endorsed by ISA/);
+  assert.match(combined, /does not reproduce official or recalled exam questions/);
+  assert.match(combined, /does not guarantee a passing result/);
+  assert.match(safety, /qualified training, employer procedures, and current regulations/);
+  assert.match(ordinance, /without giving legal advice/i);
+  assert.match(report, /Avoid guarantees about safety, legal results, tree survival, or exam outcomes/);
+  assert.match(logistics, /Avoid treating readiness scores as a guarantee/);
+}
+);
 
 test("hosts the IndexNow key at the site root", async () => {
   const key = await read("dist/e8126d98dca197b3cbcb885cacac678c.txt");

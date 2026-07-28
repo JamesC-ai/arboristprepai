@@ -7,7 +7,7 @@
 - Offers: $19 Study Sprint Pack and $49 Readiness Review, both live on PayPal
 - Safety boundary: no recalled or official exam questions, no pass guarantee, no ISA affiliation claim
 - Deployment: live on Cloudflare Pages at `https://arborist.pagecheckai.com`
-- Discovery: 14 sitemap URLs submitted to IndexNow, `202 Accepted`
+- Discovery: 45 original-study SEO pages, 49 sitemap URLs, IndexNow submission automation
 - Payment: `$19` https://www.paypal.com/ncp/payment/KDW9M2B4N5S2A
 - Payment: `$49` https://www.paypal.com/ncp/payment/S3T8ZQSJD689G
 - Visual asset: `Tree Climbing Arborist.jpg` by TreeMinion15, CC BY-SA 4.0, Wikimedia Commons
