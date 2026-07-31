@@ -88,6 +88,10 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /Concept check/);
   assert.match(html, /\$19/);
   assert.match(html, /\$49/);
+  assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristprepai/);
+  assert.match(html, /product=arboristreadiness/);
+  assert.match(html, /AP- or AR-/);
+  assert.match(html, /id="downloadPack"[^>]*disabled/);
   assert.match(html, /KDW9M2B4N5S2A/);
   assert.match(html, /S3T8ZQSJD689G/);
   assert.match(html, /not affiliated with or endorsed by/);
@@ -104,7 +108,15 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.match(app, /buildPlan/);
   assert.match(app, /correctAnswers/);
   assert.match(app, /navigator\.clipboard/);
-  assert.doesNotMatch(app, /fetch\(/);
+  assert.match(app, /function paidPackText/);
+  assert.match(app, /ArboristPrepAI Study Sprint Pack/);
+  assert.match(app, /READINESS REVIEW PACK/);
+  assert.match(app, /arboristprepai-study-sprint-pack\.txt/);
+  assert.match(app, /arboristprepai-readiness-review-pack\.txt/);
+  assert.match(app, /JSON\.stringify\(\{ code, product: selected\.product \}\)/);
+  assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*examDate/i);
+  assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*domain/i);
+  assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*lastPlanText/i);
 });
 
 test("generates policy, discovery, and SEO pages", async () => {
@@ -117,6 +129,8 @@ test("generates policy, discovery, and SEO pages", async () => {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
   assert.match(robots, /Sitemap:/);
+  assert.match(support, /product=arboristprepai/);
+  assert.match(support, /product=arboristreadiness/);
   assert.match(support, /KDW9M2B4N5S2A/);
   assert.match(support, /S3T8ZQSJD689G/);
 });
