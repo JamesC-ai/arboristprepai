@@ -103,11 +103,19 @@ const planOutput = document.querySelector("#planOutput");
 const copyPlan = document.querySelector("#copyPlan");
 const downloadPlan = document.querySelector("#downloadPlan");
 const emailPlan = document.querySelector("#emailPlan");
+const proCode = document.querySelector("#proCode");
+const activatePack = document.querySelector("#activatePack");
+const downloadPack = document.querySelector("#downloadPack");
+const proStatus = document.querySelector("#proStatus");
+const LICENSE_VERIFY_URL = "https://namebatch.pagecheckai.com/api/licenses/verify";
+const LICENSE_STORAGE_KEY = "arboristprepai.studyPackCode";
 
 let currentQuestion = 0;
 let correctAnswers = 0;
 let answeredQuestions = 0;
 let lastPlanText = "";
+let paidPackActive = false;
+let paidPackEntitlement = "";
 
 const defaultDate = new Date();
 defaultDate.setDate(defaultDate.getDate() + 42);
@@ -130,6 +138,10 @@ function domainScores() {
     name: input.dataset.domain,
     score: Number(input.value),
   }));
+}
+
+function compact(value, fallback) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, 260) || fallback;
 }
 
 function renderQuestion() {
@@ -204,6 +216,160 @@ function buildPlan() {
   emailPlan.href = `mailto:support@pagecheckai.com?subject=${encodeURIComponent("ArboristPrepAI plan")}&body=${encodeURIComponent(lastPlanText)}`;
 }
 
+function paidPackText() {
+  if (!lastPlanText) buildPlan();
+  const scores = [...domainScores()].sort((a, b) => a.score - b.score);
+  const priorities = scores.slice(0, 5);
+  const days = daysUntilExam();
+  const hours = Number(weeklyHours.value);
+  const style = studyStyle.options[studyStyle.selectedIndex].text;
+  const quizSummary = `${correctAnswers}/${answeredQuestions || questions.length} answered correctly${answeredQuestions ? "" : " (concept check not started)"}`;
+  const trackerRows = priorities
+    .map((item, index) => `${index + 1}. ${item.name} | Current confidence: ${item.score}/5 | Reference checked: _____ | Missed concept: _____ | Next recall date: _____ | Evidence note: _____`)
+    .join("\n");
+  const promptRows = priorities
+    .map((item, index) => `${index + 1}. Explain one ${item.name} decision in 90 seconds, then write the reason a tempting distractor would be wrong.`)
+    .join("\n");
+
+  const base = `ArboristPrepAI Study Sprint Pack
+
+Generated locally in this browser from the current readiness plan. Verify current credential requirements, domain weights, technical references, employer procedures, and safety standards before using any study note outside exam preparation.
+
+1. INPUT SNAPSHOT
+Target exam date: ${compact(examDate.value, "Not supplied")}
+Days available: ${days}
+Study hours per week: ${hours}
+Preferred review style: ${compact(style, "Not supplied")}
+Concept-check score: ${quizSummary}
+Lowest confidence domains: ${priorities.map((item) => `${item.name} (${item.score}/5)`).join(", ")}
+
+2. CURRENT FREE PLAN
+${lastPlanText}
+
+3. FOUR-WEEK STUDY SPRINT TRACKER
+Week 1: Baseline and weak-domain reference verification
+Week 2: Scenario explanation and terminology recall
+Week 3: Timed mixed review and written justification
+Week 4: Final-week checklist, logistics, sleep, and policy review
+
+Domain | Current score | Official/current reference checked | Missed concept | Next recall date | Evidence note
+${trackerRows}
+
+4. ORIGINAL RECALL PROMPTS
+${promptRows}
+
+5. FIELD-SAFETY STUDY BOUNDARY
+- Treat safety, climbing, rigging, chainsaw, pesticide, utility, traffic-control, wildfire, and support-system topics as conceptual review only.
+- Do not use this pack as field instruction, employer authorization, compliance approval, legal advice, pesticide direction, engineering guidance, or work-zone procedure.
+- Ask a qualified supervisor, trainer, credentialing body, AHJ, employer, or current standard before field action.
+
+6. FINAL 48-HOUR CHECKLIST
+Exam logistics confirmed: _____
+Official candidate rules checked: _____
+Weak-domain summary rewritten from memory: _____
+No new material after cutoff: _____
+Sleep, travel, ID, and allowed materials planned: _____
+
+BOUNDARIES
+ArboristPrepAI is independent and not affiliated with or endorsed by ISA. It does not reproduce official or recalled exam questions, disclose exam content, provide field-work instructions, certify eligibility, replace qualified training, or guarantee a passing result, safety result, legal result, compliance result, tree survival, business outcome, ranking, traffic, sales, or revenue.
+`;
+
+  if (paidPackEntitlement !== "readiness_review_pack") return base;
+
+  return `${base}
+
+7. READINESS REVIEW PACK
+Use this section to prepare a human review request or self-review pass without sending private details anywhere automatically.
+
+Review handoff:
+Reviewer name: _____
+Review date: _____
+Target credential/date: ${compact(examDate.value, "Not supplied")}
+Top three weak domains: ${priorities.slice(0, 3).map((item) => item.name).join(", ")}
+Study constraints: _____
+Questions for qualified mentor or instructor: _____
+
+Revised final-week checklist:
+1. Re-score each weak domain after one closed-book recall attempt.
+2. Mark any topic that needs official/current reference verification.
+3. Separate exam vocabulary from field procedures and regulated practice.
+4. Remove any note that sounds like a guarantee, diagnosis, instruction, or legal/compliance decision.
+5. Confirm current exam-day logistics from the official credential source.
+
+Reviewer notes:
+Strengths: _____
+Remaining weak concepts: _____
+Do-not-cram list: _____
+Referral or qualified-training needs: _____
+Final-week plan revision: _____
+`;
+}
+
+function setPaidPackActive(active, message, entitlement = "") {
+  paidPackActive = active;
+  paidPackEntitlement = entitlement;
+  downloadPack.disabled = !active;
+  proStatus.textContent = message;
+}
+
+function productForCode(code) {
+  if (code.startsWith("AP-")) return { product: "arboristprepai", entitlement: "study_sprint_pack" };
+  if (code.startsWith("AR-")) return { product: "arboristreadiness", entitlement: "readiness_review_pack" };
+  return null;
+}
+
+async function verifyPaidPackCode(rawCode, { quiet = false } = {}) {
+  const code = rawCode.trim().toUpperCase();
+  if (!/^(?:AP|AR)-[A-F0-9]{4}(?:-[A-F0-9]{4}){3}$/.test(code)) {
+    setPaidPackActive(false, quiet ? "Enter a valid AP- or AR- code to unlock a study pack." : "That activation code format is not valid.");
+    return false;
+  }
+  const selected = productForCode(code);
+  activatePack.disabled = true;
+  if (!quiet) proStatus.textContent = "Checking activation code...";
+  try {
+    const response = await fetch(LICENSE_VERIFY_URL, {
+      body: JSON.stringify({ code, product: selected.product }),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.valid !== true || result.entitlement !== selected.entitlement) {
+      localStorage.removeItem(LICENSE_STORAGE_KEY);
+      setPaidPackActive(false, "The code could not be verified. Check it or contact support.");
+      return false;
+    }
+    localStorage.setItem(LICENSE_STORAGE_KEY, code);
+    proCode.value = code;
+    const label = selected.entitlement === "readiness_review_pack" ? "$49 Readiness Review Pack" : "$19 Study Sprint Pack";
+    setPaidPackActive(true, `${label} unlocked on this browser.`, selected.entitlement);
+    return true;
+  } catch {
+    setPaidPackActive(false, "Activation is temporarily unavailable. Your diagnostic stays on this device.");
+    return false;
+  } finally {
+    activatePack.disabled = false;
+  }
+}
+
+function downloadPaidPack() {
+  if (!paidPackActive) {
+    setPaidPackActive(false, "Activate a study pack before downloading.");
+    proCode.focus();
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([paidPackText()], { type: "text/plain;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = paidPackEntitlement === "readiness_review_pack"
+    ? "arboristprepai-readiness-review-pack.txt"
+    : "arboristprepai-study-sprint-pack.txt";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 domainInputs.forEach((input) => {
   const output = input.parentElement.querySelector("output");
   input.addEventListener("input", () => {
@@ -259,6 +425,14 @@ downloadPlan.addEventListener("click", () => {
   link.click();
   URL.revokeObjectURL(url);
 });
+
+activatePack?.addEventListener("click", () => verifyPaidPackCode(proCode.value));
+downloadPack?.addEventListener("click", downloadPaidPack);
+const savedCode = localStorage.getItem(LICENSE_STORAGE_KEY);
+if (savedCode) {
+  proCode.value = savedCode;
+  verifyPaidPackCode(savedCode, { quiet: true });
+}
 
 updateDateStatus();
 renderQuestion();

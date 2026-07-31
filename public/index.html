@@ -157,21 +157,45 @@
 
       <section class="offer-band" id="packs">
         <div>
-          <p class="eyebrow">Launch pricing</p>
-          <h2>Keep the free diagnostic. Add review only when it saves study time.</h2>
+          <p class="eyebrow">Study packs</p>
+          <h2>Keep the free diagnostic. Unlock a deeper browser-generated pack only when it saves study time.</h2>
+          <p>
+            The paid packs are generated from the readiness plan already in this browser. Activation checks send only a code and product name;
+            exam date, weak domains, quiz answers, and notes stay on your device.
+          </p>
         </div>
         <article>
           <span class="price">$19</span>
           <h3>Study Sprint Pack</h3>
-          <p>Four-week domain plan, printable review tracker, and original recall prompts.</p>
-          <a href="https://www.paypal.com/ncp/payment/KDW9M2B4N5S2A">Buy Study Sprint Pack</a>
+          <p>Four-week domain plan, printable review tracker, original recall prompts, final 48-hour checklist, and field-safety study boundaries.</p>
+          <a href="https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731&amp;product=arboristprepai">Buy Study Sprint Pack</a>
+          <a class="fallback-link" href="https://www.paypal.com/ncp/payment/KDW9M2B4N5S2A">PayPal fallback</a>
         </article>
         <article>
           <span class="price">$49</span>
           <h3>Readiness Review</h3>
-          <p>One plan review with weak-domain priorities and a revised final-week checklist.</p>
-          <a href="https://www.paypal.com/ncp/payment/S3T8ZQSJD689G">Buy Readiness Review</a>
+          <p>Everything in the sprint pack plus a reviewer handoff, revised final-week checklist, and mentor-review question queue.</p>
+          <a href="https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731&amp;product=arboristreadiness">Buy Readiness Review</a>
+          <a class="fallback-link" href="https://www.paypal.com/ncp/payment/S3T8ZQSJD689G">PayPal fallback</a>
         </article>
+      </section>
+
+      <section class="activation-band" aria-label="Paid study pack activation">
+        <div>
+          <p class="eyebrow">Activation</p>
+          <h2>Enter an AP- or AR- code to download the paid study pack.</h2>
+        </div>
+        <div class="activation-panel">
+          <label for="proCode">
+            Activation code
+            <input id="proCode" type="text" autocomplete="off" placeholder="AP- or AR-XXXX-XXXX-XXXX-XXXX" />
+          </label>
+          <div class="activation-actions">
+            <button class="secondary-button" id="activatePack" type="button">Activate</button>
+            <button class="secondary-button" id="downloadPack" type="button" disabled>Download paid pack</button>
+          </div>
+          <p id="proStatus" class="pro-status" aria-live="polite">Enter a valid code to unlock a paid study pack.</p>
+        </div>
       </section>
 
       <section class="guide-band" aria-label="Arborist study guides">
