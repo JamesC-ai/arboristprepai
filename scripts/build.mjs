@@ -638,6 +638,8 @@ function pageHtml(page) {
       <h2>Review sequence</h2>
       <ol>${page.actions.map((action) => `<li>${escapeHtml(action)}</li>`).join("")}</ol>
       <p><a class="primary-button" href="/#diagnostic">Run the free diagnostic</a></p>
+      <h2>When a paid study pack is worth it</h2>
+      <p>Use the free diagnostic first. Buy the $19 Study Sprint Pack only when it exposes a real study gap and you want a browser-generated four-week sprint with recall prompts and a final 48-hour checklist. Choose the $49 Readiness Review only when you need a cleaner mentor handoff. Skip payment if you need official ISA materials, recalled exam questions, eligibility decisions, current safety training, or a passing-score guarantee.</p>
       <h2>Independent-use boundary</h2>
       <p>ArboristPrepAI is not affiliated with or endorsed by ISA. It does not reproduce official or recalled exam questions and does not guarantee a passing result. Verify current requirements and technical guidance with official sources.</p>
       <p><a href="/support.html">Support</a> · <a href="https://tools.pagecheckai.com">More PageCheckAI tools</a></p>

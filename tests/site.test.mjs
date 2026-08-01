@@ -84,6 +84,14 @@ const seoRoutes = [
 test("ships the study diagnostic and launch offers", async () => {
   const html = await read("dist/index.html");
   assert.match(html, /ArboristPrepAI/);
+  assert.match(html, /Turn weak arborist domains into a free weekly study plan/);
+  assert.match(html, /Start free readiness check/);
+  assert.match(html, /Compare \$19 and \$49 packs/);
+  assert.match(html, /Free diagnostic first/);
+  assert.match(html, /Buy after the free check proves the study gap/);
+  assert.match(html, /Good fit for \$19/);
+  assert.match(html, /Good fit for \$49/);
+  assert.match(html, /Skip payment when/);
   assert.match(html, /Confidence by domain/);
   assert.match(html, /Concept check/);
   assert.match(html, /\$19/);
@@ -95,6 +103,7 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /KDW9M2B4N5S2A/);
   assert.match(html, /S3T8ZQSJD689G/);
   assert.match(html, /not affiliated with or endorsed by/);
+  assert.match(html, /does not guarantee a passing result/);
   assert.match(html, /Plant identification/);
   assert.match(html, /Construction protection/);
   assert.match(html, /Pest identification/);
@@ -140,6 +149,9 @@ test("renders all study pages with independent-use boundaries", async () => {
     const html = await read(`dist/${route}/index.html`);
     assert.match(html, /ArboristPrepAI/);
     assert.match(html, /Run the free diagnostic/);
+    assert.match(html, /When a paid study pack is worth it/);
+    assert.match(html, /Buy the \$19 Study Sprint Pack only when/);
+    assert.match(html, /Skip payment if you need official ISA materials/);
     assert.match(html, /not affiliated with or endorsed by ISA/);
     assert.match(html, /does not reproduce official or recalled exam questions/);
     assert.match(html, /does not guarantee a passing result/);

@@ -166,6 +166,39 @@ h1 {
   font-size: 0.68rem;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hero-secondary {
+  color: white;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: min(760px, 100%);
+  margin-top: 20px;
+}
+
+.trust-strip span {
+  min-height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  color: #edf6ef;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .primary-button,
 .secondary-button {
   min-height: 42px;
@@ -447,6 +480,7 @@ output {
 }
 
 .offer-band,
+.buyer-band,
 .activation-band,
 .guide-band,
 .boundary-band {
@@ -493,6 +527,48 @@ output {
 .fallback-link {
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.buyer-band {
+  grid-template-columns: minmax(260px, 0.64fr) minmax(520px, 1.36fr);
+  background: white;
+  border-top: 1px solid var(--line);
+}
+
+.buyer-band h2 {
+  margin: 6px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.85rem;
+}
+
+.buyer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.buyer-grid article {
+  min-width: 0;
+  padding: 16px;
+  background: #f8faf7;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.buyer-grid h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.buyer-grid ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.buyer-grid li + li {
+  margin-top: 8px;
 }
 
 .activation-band {
@@ -615,6 +691,10 @@ footer span:last-child {
   .results-panel {
     grid-column: 1 / -1;
   }
+
+  .buyer-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -631,6 +711,7 @@ footer span:last-child {
   .intro-band,
   .workspace,
   .offer-band,
+  .buyer-band,
   .activation-band,
   .guide-band,
   .boundary-band {
@@ -644,6 +725,10 @@ footer span:last-child {
 
   h1 {
     font-size: 2.65rem;
+  }
+
+  .trust-strip {
+    grid-template-columns: 1fr 1fr;
   }
 
   .field-visual {
@@ -667,6 +752,7 @@ footer span:last-child {
   }
 
   .offer-band,
+  .buyer-band,
   .activation-band,
   .guide-band,
   .boundary-band {
