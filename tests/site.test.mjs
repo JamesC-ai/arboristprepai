@@ -102,6 +102,8 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /id="downloadPack"[^>]*disabled/);
   assert.match(html, /KDW9M2B4N5S2A/);
   assert.match(html, /S3T8ZQSJD689G/);
+  assert.match(html, /After payment, enter the AP- or AR- activation code here/);
+  assert.match(html, /open support/);
   assert.match(html, /not affiliated with or endorsed by/);
   assert.match(html, /does not guarantee a passing result/);
   assert.match(html, /Plant identification/);
