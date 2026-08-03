@@ -96,8 +96,8 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /Concept check/);
   assert.match(html, /\$19/);
   assert.match(html, /\$49/);
-  assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristprepai/);
-  assert.match(html, /product=arboristreadiness/);
+  assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_study/);
+  assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_review/);
   assert.match(html, /AP- or AR-/);
   assert.match(html, /id="downloadPack"[^>]*disabled/);
   assert.match(html, /KDW9M2B4N5S2A/);
@@ -140,8 +140,8 @@ test("generates policy, discovery, and SEO pages", async () => {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
   assert.match(robots, /Sitemap:/);
-  assert.match(support, /product=arboristprepai/);
-  assert.match(support, /product=arboristreadiness/);
+  assert.match(support, /product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=support_study/);
+  assert.match(support, /product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=support_review/);
   assert.match(support, /KDW9M2B4N5S2A/);
   assert.match(support, /S3T8ZQSJD689G/);
 });
@@ -157,6 +157,8 @@ test("renders all study pages with independent-use boundaries", async () => {
     assert.match(html, /not affiliated with or endorsed by ISA/);
     assert.match(html, /does not reproduce official or recalled exam questions/);
     assert.match(html, /does not guarantee a passing result/);
+    assert.match(html, new RegExp(`product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=seo_${route}_study`));
+    assert.match(html, new RegExp(`product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=seo_${route}_review`));
   }
 });
 
