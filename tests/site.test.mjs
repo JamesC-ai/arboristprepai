@@ -96,6 +96,7 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /Concept check/);
   assert.match(html, /id="readinessScore">N\/A/);
   assert.match(html, /id="readinessLabel">0\/12 checked/);
+  assert.match(html, /id="examDate" type="date" required/);
   assert.match(html, /\$19/);
   assert.match(html, /\$49/);
   assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_study/);
@@ -122,6 +123,10 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.match(app, /correctAnswers/);
   assert.match(app, /not calculated until all \$\{questions\.length\} concept checks are answered/);
   assert.match(app, /answeredQuestions === questions\.length/);
+  assert.match(app, /function ensurePaidReadinessComplete/);
+  assert.match(app, /Complete all \$\{questions\.length\} original concept checks/);
+  assert.doesNotMatch(app, /defaultDate\.setDate/);
+  assert.doesNotMatch(app, /examDate\.value = defaultDate/);
   assert.match(app, /Restart check/);
   assert.doesNotMatch(app, /currentQuestion = \(currentQuestion \+ 1\) % questions\.length/);
   assert.doesNotMatch(app, /answeredQuestions \? correctAnswers \/ answeredQuestions : 0\.5/);

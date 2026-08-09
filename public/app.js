@@ -118,11 +118,8 @@ let lastPlanText = "";
 let paidPackActive = false;
 let paidPackEntitlement = "";
 
-const defaultDate = new Date();
-defaultDate.setDate(defaultDate.getDate() + 42);
-examDate.value = defaultDate.toISOString().slice(0, 10);
-
 function daysUntilExam() {
+  if (!examDate.value) return null;
   const selected = new Date(`${examDate.value}T12:00:00`);
   const today = new Date();
   today.setHours(12, 0, 0, 0);
@@ -131,7 +128,7 @@ function daysUntilExam() {
 
 function updateDateStatus() {
   const days = daysUntilExam();
-  dateStatus.textContent = `${days} days available for focused review.`;
+  dateStatus.textContent = days === null ? "Choose a target date." : `${days} days available for focused review.`;
 }
 
 function domainScores() {
@@ -165,6 +162,7 @@ function renderQuestion() {
 }
 
 function buildPlan() {
+  if (!planForm.checkValidity()) return false;
   const scores = domainScores();
   const priorities = [...scores].sort((a, b) => a.score - b.score).slice(0, 3);
   const confidence = scores.reduce((sum, item) => sum + item.score, 0) / scores.length / 5;
@@ -221,6 +219,22 @@ function buildPlan() {
     "Independent practice only. Verify current requirements and technical guidance with official sources.",
   ].join("\n");
   emailPlan.href = `mailto:support@pagecheckai.com?subject=${encodeURIComponent("ArboristPrepAI plan")}&body=${encodeURIComponent(lastPlanText)}`;
+  return true;
+}
+
+function ensurePaidReadinessComplete() {
+  if (!planForm.checkValidity()) {
+    planForm.reportValidity();
+    setPaidPackActive(true, "Choose the current exam date and study hours before downloading.", paidPackEntitlement);
+    return false;
+  }
+  if (answeredQuestions !== questions.length) {
+    setPaidPackActive(true, `Complete all ${questions.length} original concept checks before downloading the paid pack.`, paidPackEntitlement);
+    quizForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    return false;
+  }
+  buildPlan();
+  return true;
 }
 
 function paidPackText() {
@@ -369,6 +383,7 @@ function downloadPaidPack() {
     proCode.focus();
     return;
   }
+  if (!ensurePaidReadinessComplete()) return;
   const url = URL.createObjectURL(new Blob([paidPackText()], { type: "text/plain;charset=utf-8" }));
   const link = document.createElement("a");
   link.href = url;
@@ -391,7 +406,7 @@ domainInputs.forEach((input) => {
 examDate.addEventListener("change", updateDateStatus);
 planForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  buildPlan();
+  if (!buildPlan()) return;
   document.querySelector(".results-panel").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
@@ -431,7 +446,10 @@ nextQuestion.addEventListener("click", () => {
 });
 
 copyPlan.addEventListener("click", async () => {
-  if (!lastPlanText) buildPlan();
+  if (!buildPlan()) {
+    planForm.reportValidity();
+    return;
+  }
   await navigator.clipboard.writeText(lastPlanText);
   copyPlan.textContent = "Copied";
   setTimeout(() => {
@@ -440,7 +458,10 @@ copyPlan.addEventListener("click", async () => {
 });
 
 downloadPlan.addEventListener("click", () => {
-  if (!lastPlanText) buildPlan();
+  if (!buildPlan()) {
+    planForm.reportValidity();
+    return;
+  }
   const url = URL.createObjectURL(new Blob([lastPlanText], { type: "text/plain" }));
   const link = document.createElement("a");
   link.href = url;
@@ -459,4 +480,3 @@ if (savedCode) {
 
 updateDateStatus();
 renderQuestion();
-buildPlan();
