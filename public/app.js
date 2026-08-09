@@ -98,6 +98,7 @@ const quizProgress = document.querySelector("#quizProgress");
 const answerFeedback = document.querySelector("#answerFeedback");
 const nextQuestion = document.querySelector("#nextQuestion");
 const readinessScore = document.querySelector("#readinessScore");
+const readinessLabel = document.querySelector("#readinessLabel");
 const priorityList = document.querySelector("#priorityList");
 const planOutput = document.querySelector("#planOutput");
 const copyPlan = document.querySelector("#copyPlan");
@@ -160,20 +161,24 @@ function renderQuestion() {
   answerFeedback.textContent = "Select one answer.";
   answerFeedback.className = "answer-feedback";
   nextQuestion.disabled = true;
+  nextQuestion.textContent = "Next";
 }
 
 function buildPlan() {
   const scores = domainScores();
   const priorities = [...scores].sort((a, b) => a.score - b.score).slice(0, 3);
   const confidence = scores.reduce((sum, item) => sum + item.score, 0) / scores.length / 5;
-  const quizRatio = answeredQuestions ? correctAnswers / answeredQuestions : 0.5;
-  const readiness = Math.round((confidence * 0.55 + quizRatio * 0.45) * 100);
+  const selfAssessment = Math.round(confidence * 100);
+  const conceptCheckComplete = answeredQuestions === questions.length;
+  const quizRatio = conceptCheckComplete ? correctAnswers / questions.length : null;
+  const readiness = conceptCheckComplete ? Math.round((confidence * 0.55 + quizRatio * 0.45) * 100) : null;
   const days = daysUntilExam();
   const weeks = Math.max(1, Math.ceil(days / 7));
   const hours = Number(weeklyHours.value);
   const style = studyStyle.options[studyStyle.selectedIndex].text;
 
-  readinessScore.textContent = readiness;
+  readinessScore.textContent = readiness ?? "N/A";
+  readinessLabel.textContent = conceptCheckComplete ? "heuristic indicator" : `${answeredQuestions}/${questions.length} checked`;
   priorityList.innerHTML = priorities.map((item) => `<li>${item.name} <span>${item.score}/5</span></li>`).join("");
 
   const phases = [
@@ -206,7 +211,9 @@ function buildPlan() {
     "ArboristPrepAI readiness plan",
     `Target date: ${examDate.value} (${days} days)`,
     `Study time: ${hours} hours/week`,
-    `Current readiness: ${readiness}/100`,
+    `Self-assessed domain confidence: ${selfAssessment}/100`,
+    `Concept check: ${conceptCheckComplete ? `${correctAnswers}/${questions.length} correct (complete)` : `${correctAnswers}/${answeredQuestions} correct; ${answeredQuestions}/${questions.length} answered (incomplete)`}`,
+    `Combined readiness indicator: ${conceptCheckComplete ? `${readiness}/100 (heuristic)` : `not calculated until all ${questions.length} concept checks are answered`}`,
     `Priority domains: ${priorities.map((item) => `${item.name} (${item.score}/5)`).join(", ")}`,
     "",
     ...phases.map((phase, index) => `Phase ${index + 1}: ${phase.title}\n${phase.body}`),
@@ -223,7 +230,11 @@ function paidPackText() {
   const days = daysUntilExam();
   const hours = Number(weeklyHours.value);
   const style = studyStyle.options[studyStyle.selectedIndex].text;
-  const quizSummary = `${correctAnswers}/${answeredQuestions || questions.length} answered correctly${answeredQuestions ? "" : " (concept check not started)"}`;
+  const quizSummary = answeredQuestions === 0
+    ? `Not started (0/${questions.length} answered)`
+    : answeredQuestions === questions.length
+      ? `${correctAnswers}/${questions.length} correct (complete)`
+      : `${correctAnswers}/${answeredQuestions} correct; ${answeredQuestions}/${questions.length} answered (incomplete)`;
   const trackerRows = priorities
     .map((item, index) => `${index + 1}. ${item.name} | Current confidence: ${item.score}/5 | Reference checked: _____ | Missed concept: _____ | Next recall date: _____ | Evidence note: _____`)
     .join("\n");
@@ -387,7 +398,7 @@ planForm.addEventListener("submit", (event) => {
 quizForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const selected = document.querySelector('input[name="answer"]:checked');
-  if (!selected || nextQuestion.disabled === false) return;
+  if (!selected || nextQuestion.disabled === false || answeredQuestions >= questions.length) return;
 
   const question = questions[currentQuestion];
   const isCorrect = Number(selected.value) === question.correct;
@@ -396,6 +407,10 @@ quizForm.addEventListener("submit", (event) => {
   answerFeedback.textContent = `${isCorrect ? "Correct." : "Review this."} ${question.explanation}`;
   answerFeedback.className = `answer-feedback ${isCorrect ? "correct" : "review"}`;
   nextQuestion.disabled = false;
+  if (answeredQuestions === questions.length) {
+    nextQuestion.textContent = "Restart check";
+    quizProgress.textContent = `Question ${questions.length} of ${questions.length} · complete`;
+  }
   answerList.querySelectorAll("input").forEach((input) => {
     input.disabled = true;
   });
@@ -403,7 +418,15 @@ quizForm.addEventListener("submit", (event) => {
 });
 
 nextQuestion.addEventListener("click", () => {
-  currentQuestion = (currentQuestion + 1) % questions.length;
+  if (answeredQuestions === questions.length) {
+    currentQuestion = 0;
+    correctAnswers = 0;
+    answeredQuestions = 0;
+    renderQuestion();
+    buildPlan();
+    return;
+  }
+  currentQuestion += 1;
   renderQuestion();
 });
 
