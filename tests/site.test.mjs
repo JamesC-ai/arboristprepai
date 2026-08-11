@@ -145,6 +145,12 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.match(app, /READINESS REVIEW PACK/);
   assert.match(app, /arboristprepai-study-sprint-pack\.txt/);
   assert.match(app, /arboristprepai-readiness-review-pack\.txt/);
+  assert.match(app, /function downloadTextFile/);
+  assert.match(app, /window\.setTimeout\(\(\) => URL\.revokeObjectURL\(url\), 1000\)/);
+  assert.match(app, /Paid study pack download started\. Wait for your browser to confirm the file\./);
+  assert.match(app, /Your current reviewed plan and activation are still available; try again\./);
+  assert.match(app, /started \? "Download started" : "Retry download"/);
+  assert.doesNotMatch(app, /link\.remove\(\);\s*URL\.revokeObjectURL\(url\);/);
   assert.match(app, /JSON\.stringify\(\{ code, product: selected\.product \}\)/);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*examDate/i);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*domain/i);

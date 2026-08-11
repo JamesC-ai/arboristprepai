@@ -464,16 +464,30 @@ function downloadPaidPack() {
     return;
   }
   if (!ensurePaidReadinessComplete()) return;
-  const url = URL.createObjectURL(new Blob([paidPackText()], { type: "text/plain;charset=utf-8" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = paidPackEntitlement === "readiness_review_pack"
+  const filename = paidPackEntitlement === "readiness_review_pack"
     ? "arboristprepai-readiness-review-pack.txt"
     : "arboristprepai-study-sprint-pack.txt";
-  document.body.append(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  if (downloadTextFile(paidPackText(), filename)) {
+    setPaidPackActive(true, "Paid study pack download started. Wait for your browser to confirm the file.", paidPackEntitlement);
+    return;
+  }
+  setPaidPackActive(true, "Paid study pack download could not start. Your current reviewed plan and activation are still available; try again.", paidPackEntitlement);
+}
+
+function downloadTextFile(text, filename) {
+  try {
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 domainInputs.forEach((input) => {
@@ -548,12 +562,11 @@ downloadPlan.addEventListener("click", () => {
     planForm.reportValidity();
     return;
   }
-  const url = URL.createObjectURL(new Blob([lastPlanText], { type: "text/plain" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "arboristprepai-study-plan.txt";
-  link.click();
-  URL.revokeObjectURL(url);
+  const started = downloadTextFile(lastPlanText, "arboristprepai-study-plan.txt");
+  downloadPlan.textContent = started ? "Download started" : "Retry download";
+  window.setTimeout(() => {
+    downloadPlan.textContent = "Download";
+  }, 1200);
 });
 
 activatePack?.addEventListener("click", () => verifyPaidPackCode(proCode.value));
