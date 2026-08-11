@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -99,12 +99,16 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /id="examDate" type="date" required/);
   assert.match(html, /\$19/);
   assert.match(html, /\$49/);
-  assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_study/);
-  assert.match(html, /namebatch\.pagecheckai\.com\/api\/checkout\?v=arborist-20260731&amp;product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_review/);
+  assert.match(html, /id="checkoutStudy"[^>]*aria-disabled="true"/);
+  assert.match(html, /id="checkoutReview"[^>]*aria-disabled="true"/);
   assert.match(html, /AP- or AR-/);
   assert.match(html, /id="downloadPack"[^>]*disabled/);
-  assert.match(html, /KDW9M2B4N5S2A/);
-  assert.match(html, /S3T8ZQSJD689G/);
+  assert.match(html, /id="officialSource"[^>]*type="url"[^>]*required/);
+  assert.match(html, /id="sourceCheckedDate"[^>]*required/);
+  assert.match(html, /id="studyReviewer"[^>]*required/);
+  assert.match(html, /id="reviewNotes"[^>]*minlength="80"[^>]*required/);
+  assert.match(html, /id="originalPracticeConfirmed"[^>]*required/);
+  assert.doesNotMatch(html, /namebatch\.pagecheckai\.com\/api\/checkout|paypal\.com\/ncp\/payment/);
   assert.match(html, /After payment, enter the AP- or AR- activation code here/);
   assert.match(html, /open support/);
   assert.match(html, /not affiliated with or endorsed by/);
@@ -124,6 +128,11 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.match(app, /not calculated until all \$\{questions\.length\} concept checks are answered/);
   assert.match(app, /answeredQuestions === questions\.length/);
   assert.match(app, /function ensurePaidReadinessComplete/);
+  assert.match(app, /function invalidateCurrentStudy/);
+  assert.match(app, /function updatePaymentGate/);
+  assert.match(app, /qualified_study_plan/);
+  assert.match(app, /qualified_readiness_review/);
+  assert.match(app, /sourceCheckedDate\.value > today/);
   assert.match(app, /Complete all \$\{questions\.length\} original concept checks/);
   assert.doesNotMatch(app, /defaultDate\.setDate/);
   assert.doesNotMatch(app, /examDate\.value = defaultDate/);
@@ -152,10 +161,9 @@ test("generates policy, discovery, and SEO pages", async () => {
     assert.ok(sitemapUrls.includes(`https://arborist.pagecheckai.com/${route}/`), `missing sitemap route: ${route}`);
   }
   assert.match(robots, /Sitemap:/);
-  assert.match(support, /product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=support_study/);
-  assert.match(support, /product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=support_review/);
-  assert.match(support, /KDW9M2B4N5S2A/);
-  assert.match(support, /S3T8ZQSJD689G/);
+  assert.match(support, /Prepare the free study plan before payment/);
+  assert.match(support, /specific mentor-review scope/);
+  assert.doesNotMatch(support, /namebatch\.pagecheckai\.com\/api\/checkout|paypal\.com\/ncp\/payment/);
 });
 
 test("renders all study pages with independent-use boundaries", async () => {
@@ -169,8 +177,18 @@ test("renders all study pages with independent-use boundaries", async () => {
     assert.match(html, /not affiliated with or endorsed by ISA/);
     assert.match(html, /does not reproduce official or recalled exam questions/);
     assert.match(html, /does not guarantee a passing result/);
-    assert.match(html, new RegExp(`product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=seo_${route}_study`));
-    assert.match(html, new RegExp(`product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=seo_${route}_review`));
+    assert.match(html, new RegExp(`utm_content=${route}_free_plan#diagnostic`));
+    assert.doesNotMatch(html, /namebatch\.pagecheckai\.com\/api\/checkout|paypal\.com\/ncp\/payment/);
+  }
+});
+
+test("all static HTML stays free-first without direct payment destinations", async () => {
+  const files = await readdir(new URL("../dist", import.meta.url), { recursive: true });
+  const htmlFiles = files.filter((file) => file.endsWith(".html"));
+  assert.ok(htmlFiles.length >= 79);
+  for (const file of htmlFiles) {
+    const html = await read(`dist/${file}`);
+    assert.doesNotMatch(html, /namebatch\.pagecheckai\.com\/api\/checkout|paypal\.com\/ncp\/payment/, file);
   }
 });
 

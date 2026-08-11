@@ -108,8 +108,16 @@ const proCode = document.querySelector("#proCode");
 const activatePack = document.querySelector("#activatePack");
 const downloadPack = document.querySelector("#downloadPack");
 const proStatus = document.querySelector("#proStatus");
+const paymentStatus = document.querySelector("#paymentStatus");
+const checkoutStudy = document.querySelector("#checkoutStudy");
+const checkoutReview = document.querySelector("#checkoutReview");
+const paypalStudy = document.querySelector("#paypalStudy");
+const paypalReview = document.querySelector("#paypalReview");
 const LICENSE_VERIFY_URL = "https://namebatch.pagecheckai.com/api/licenses/verify";
 const LICENSE_STORAGE_KEY = "arboristprepai.studyPackCode";
+const CHECKOUT_BASE = "https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731";
+const PAYPAL_STUDY_URL = "https://www.paypal.com/ncp/payment/KDW9M2B4N5S2A";
+const PAYPAL_REVIEW_URL = "https://www.paypal.com/ncp/payment/S3T8ZQSJD689G";
 
 let currentQuestion = 0;
 let correctAnswers = 0;
@@ -117,6 +125,54 @@ let answeredQuestions = 0;
 let lastPlanText = "";
 let paidPackActive = false;
 let paidPackEntitlement = "";
+let currentStudyReady = false;
+
+function mentorScopeReady() {
+  return document.querySelector("#mentorReviewScope").value.trim().length >= 40;
+}
+
+function checkoutUrl(product, content) {
+  const url = new URL(CHECKOUT_BASE);
+  url.searchParams.set("product", product);
+  url.searchParams.set("utm_source", "arboristprepai");
+  url.searchParams.set("utm_medium", "owned");
+  url.searchParams.set("utm_campaign", "conversion");
+  url.searchParams.set("utm_content", content);
+  return url.toString();
+}
+
+function setLinkState(link, href) {
+  if (href) {
+    link.href = href;
+    link.setAttribute("aria-disabled", "false");
+    return;
+  }
+  link.removeAttribute("href");
+  link.setAttribute("aria-disabled", "true");
+}
+
+function updatePaymentGate() {
+  setLinkState(checkoutStudy, currentStudyReady ? checkoutUrl("arboristprepai", "qualified_study_plan") : "");
+  setLinkState(paypalStudy, currentStudyReady ? PAYPAL_STUDY_URL : "");
+  setLinkState(checkoutReview, currentStudyReady && mentorScopeReady() ? checkoutUrl("arboristreadiness", "qualified_readiness_review") : "");
+  setLinkState(paypalReview, currentStudyReady && mentorScopeReady() ? PAYPAL_REVIEW_URL : "");
+  paymentStatus.textContent = currentStudyReady
+    ? mentorScopeReady()
+      ? "The current source-reviewed plan qualifies for both packs. Verify official requirements again before paying."
+      : "The current plan qualifies for $19. Add a specific mentor-review scope and rebuild to qualify for $49."
+    : "Complete the current original concept check and source-reviewed study plan before payment links become available.";
+}
+
+function invalidateCurrentStudy() {
+  currentStudyReady = false;
+  lastPlanText = "";
+  copyPlan.disabled = true;
+  downloadPlan.disabled = true;
+  emailPlan.removeAttribute("href");
+  emailPlan.setAttribute("aria-disabled", "true");
+  downloadPack.disabled = true;
+  updatePaymentGate();
+}
 
 function daysUntilExam() {
   if (!examDate.value) return null;
@@ -162,6 +218,9 @@ function renderQuestion() {
 }
 
 function buildPlan() {
+  const sourceCheckedDate = document.querySelector("#sourceCheckedDate");
+  const today = new Date().toISOString().slice(0, 10);
+  sourceCheckedDate.setCustomValidity(sourceCheckedDate.value > today ? "The source review date cannot be in the future." : "");
   if (!planForm.checkValidity()) return false;
   const scores = domainScores();
   const priorities = [...scores].sort((a, b) => a.score - b.score).slice(0, 3);
@@ -213,12 +272,23 @@ function buildPlan() {
     `Concept check: ${conceptCheckComplete ? `${correctAnswers}/${questions.length} correct (complete)` : `${correctAnswers}/${answeredQuestions} correct; ${answeredQuestions}/${questions.length} answered (incomplete)`}`,
     `Combined readiness indicator: ${conceptCheckComplete ? `${readiness}/100 (heuristic)` : `not calculated until all ${questions.length} concept checks are answered`}`,
     `Priority domains: ${priorities.map((item) => `${item.name} (${item.score}/5)`).join(", ")}`,
+    `Official credential source reviewed: ${document.querySelector("#officialSource").value.trim()}`,
+    `Source checked date: ${sourceCheckedDate.value}`,
+    `Study-plan reviewer: ${document.querySelector("#studyReviewer").value.trim()}`,
+    `Review notes: ${document.querySelector("#reviewNotes").value.trim()}`,
+    `Mentor-review scope: ${document.querySelector("#mentorReviewScope").value.trim() || "Not requested"}`,
     "",
     ...phases.map((phase, index) => `Phase ${index + 1}: ${phase.title}\n${phase.body}`),
     "",
     "Independent practice only. Verify current requirements and technical guidance with official sources.",
   ].join("\n");
   emailPlan.href = `mailto:support@pagecheckai.com?subject=${encodeURIComponent("ArboristPrepAI plan")}&body=${encodeURIComponent(lastPlanText)}`;
+  emailPlan.setAttribute("aria-disabled", "false");
+  copyPlan.disabled = false;
+  downloadPlan.disabled = false;
+  currentStudyReady = conceptCheckComplete;
+  updatePaymentGate();
+  setPaidPackActive(paidPackActive, paidPackActive ? "Activated pack is ready for this current reviewed study plan." : proStatus.textContent, paidPackEntitlement);
   return true;
 }
 
@@ -233,7 +303,11 @@ function ensurePaidReadinessComplete() {
     quizForm.scrollIntoView({ behavior: "smooth", block: "start" });
     return false;
   }
-  buildPlan();
+  if (!buildPlan() || !currentStudyReady) return false;
+  if (paidPackEntitlement === "readiness_review_pack" && !mentorScopeReady()) {
+    setPaidPackActive(true, "Add at least 40 characters describing the current mentor-review scope before downloading the $49 pack.", paidPackEntitlement);
+    return false;
+  }
   return true;
 }
 
@@ -265,6 +339,11 @@ Target exam date: ${compact(examDate.value, "Not supplied")}
 Days available: ${days}
 Study hours per week: ${hours}
 Preferred review style: ${compact(style, "Not supplied")}
+Official credential source reviewed: ${compact(document.querySelector("#officialSource").value, "Not supplied")}
+Source checked date: ${compact(document.querySelector("#sourceCheckedDate").value, "Not supplied")}
+Study-plan reviewer: ${compact(document.querySelector("#studyReviewer").value, "Not supplied")}
+Review and safety-boundary notes: ${compact(document.querySelector("#reviewNotes").value, "Not supplied")}
+Mentor-review scope: ${compact(document.querySelector("#mentorReviewScope").value, "Not requested")}
 Concept-check score: ${quizSummary}
 Lowest confidence domains: ${priorities.map((item) => `${item.name} (${item.score}/5)`).join(", ")}
 
@@ -333,7 +412,8 @@ Final-week plan revision: _____
 function setPaidPackActive(active, message, entitlement = "") {
   paidPackActive = active;
   paidPackEntitlement = entitlement;
-  downloadPack.disabled = !active;
+  const tierReady = entitlement !== "readiness_review_pack" || mentorScopeReady();
+  downloadPack.disabled = !active || !currentStudyReady || !tierReady;
   proStatus.textContent = message;
 }
 
@@ -403,6 +483,11 @@ domainInputs.forEach((input) => {
   });
 });
 
+planForm.addEventListener("input", (event) => {
+  if (event.target.id === "sourceCheckedDate") event.target.setCustomValidity("");
+  invalidateCurrentStudy();
+});
+
 examDate.addEventListener("change", updateDateStatus);
 planForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -437,6 +522,7 @@ nextQuestion.addEventListener("click", () => {
     currentQuestion = 0;
     correctAnswers = 0;
     answeredQuestions = 0;
+    invalidateCurrentStudy();
     renderQuestion();
     buildPlan();
     return;
@@ -480,3 +566,4 @@ if (savedCode) {
 
 updateDateStatus();
 renderQuestion();
+invalidateCurrentStudy();

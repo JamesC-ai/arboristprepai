@@ -1,18 +1,6 @@
 import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 
 const siteUrl = "https://arborist.pagecheckai.com";
-const studyPaymentUrl = "https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731&product=arboristprepai";
-const reviewPaymentUrl = "https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731&product=arboristreadiness";
-
-function checkoutUrlFor(paymentUrl, content) {
-  const url = new URL(paymentUrl);
-  url.searchParams.set("utm_source", "arboristprepai");
-  url.searchParams.set("utm_medium", "owned");
-  url.searchParams.set("utm_campaign", "conversion");
-  url.searchParams.set("utm_content", content);
-  return url.toString().replaceAll("&", "&amp;");
-}
-
 const pages = [
   {
     slug: "certified-arborist-study-plan",
@@ -649,11 +637,8 @@ function pageHtml(page) {
       <p>${escapeHtml(page.intent)}</p>
       <h2>Review sequence</h2>
       <ol>${page.actions.map((action) => `<li>${escapeHtml(action)}</li>`).join("")}</ol>
-      <p><a class="primary-button" href="/#diagnostic">Run the free diagnostic</a></p>
-      <p>
-        <a class="primary-button" href="${checkoutUrlFor(studyPaymentUrl, `seo_${page.slug}_study`)}">Buy $19 Study Sprint Pack</a>
-        <a class="secondary-button" href="${checkoutUrlFor(reviewPaymentUrl, `seo_${page.slug}_review`)}">Buy $49 Readiness Review</a>
-      </p>
+      <p><a class="primary-button" href="/?utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=seo&amp;utm_content=${escapeHtml(page.slug)}_free_plan#diagnostic">Run the free diagnostic</a></p>
+      <p><a class="secondary-button" href="/support.html">Review paid pack boundaries</a></p>
       <h2>When a paid study pack is worth it</h2>
       <p>Use the free diagnostic first. Buy the $19 Study Sprint Pack only when it exposes a real study gap and you want a browser-generated four-week sprint with recall prompts and a final 48-hour checklist. Choose the $49 Readiness Review only when you need a cleaner mentor handoff. Skip payment if you need official ISA materials, recalled exam questions, eligibility decisions, current safety training, or a passing-score guarantee.</p>
       <h2>Independent-use boundary</h2>

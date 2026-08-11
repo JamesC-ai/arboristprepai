@@ -87,6 +87,33 @@
             </select>
           </label>
 
+          <label>
+            Current official credential source reviewed
+            <input id="officialSource" type="url" placeholder="https://www.isa-arbor.com/..." required />
+          </label>
+          <div class="form-row">
+            <label>
+              Source checked date
+              <input id="sourceCheckedDate" type="date" required />
+            </label>
+            <label>
+              Study-plan reviewer
+              <input id="studyReviewer" minlength="3" placeholder="Learner, trainer, or mentor" required />
+            </label>
+          </div>
+          <label>
+            Current exam-scope and safety-boundary notes
+            <textarea id="reviewNotes" rows="5" minlength="80" placeholder="Record the current credential scope, permitted study material, weak domains, and topics that require official references or qualified field training." required></textarea>
+          </label>
+          <label>
+            Mentor-review scope for the $49 tier
+            <textarea id="mentorReviewScope" rows="3" minlength="40" placeholder="Optional for the free plan and $19 tier. Specify what a mentor should inspect before using the $49 handoff."></textarea>
+          </label>
+          <label class="check-label">
+            <input id="originalPracticeConfirmed" type="checkbox" required />
+            I used only original practice and public or authorized sources, included no recalled/private exam content, and will verify field-work and safety topics with qualified current guidance.
+          </label>
+
           <fieldset class="domain-fieldset">
             <legend>Confidence by domain</legend>
             <div class="domain-grid" id="domainGrid">
@@ -158,9 +185,9 @@
           </div>
 
           <div class="result-actions">
-            <button class="secondary-button" id="copyPlan" type="button">Copy plan</button>
-            <button class="secondary-button" id="downloadPlan" type="button">Download</button>
-            <a class="secondary-button" id="emailPlan" href="mailto:support@pagecheckai.com?subject=ArboristPrepAI%20plan">Email plan</a>
+            <button class="secondary-button" id="copyPlan" type="button" disabled>Copy plan</button>
+            <button class="secondary-button" id="downloadPlan" type="button" disabled>Download</button>
+            <a class="secondary-button" id="emailPlan" aria-disabled="true">Email plan</a>
           </div>
         </section>
       </section>
@@ -178,15 +205,15 @@
           <span class="price">$19</span>
           <h3>Study Sprint Pack</h3>
           <p>Four-week domain plan, printable review tracker, original recall prompts, final 48-hour checklist, and field-safety study boundaries.</p>
-          <a href="https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731&amp;product=arboristprepai&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_study">Buy Study Sprint Pack</a>
-          <a class="fallback-link" href="https://www.paypal.com/ncp/payment/KDW9M2B4N5S2A">PayPal fallback</a>
+          <a id="checkoutStudy" aria-disabled="true">Buy Study Sprint Pack</a>
+          <a id="paypalStudy" class="fallback-link" aria-disabled="true">PayPal fallback</a>
         </article>
         <article>
           <span class="price">$49</span>
           <h3>Readiness Review</h3>
           <p>Everything in the sprint pack plus a reviewer handoff, revised final-week checklist, and mentor-review question queue.</p>
-          <a href="https://namebatch.pagecheckai.com/api/checkout?v=arborist-20260731&amp;product=arboristreadiness&amp;utm_source=arboristprepai&amp;utm_medium=owned&amp;utm_campaign=conversion&amp;utm_content=home_review">Buy Readiness Review</a>
-          <a class="fallback-link" href="https://www.paypal.com/ncp/payment/S3T8ZQSJD689G">PayPal fallback</a>
+          <a id="checkoutReview" aria-disabled="true">Buy Readiness Review</a>
+          <a id="paypalReview" class="fallback-link" aria-disabled="true">PayPal fallback</a>
         </article>
       </section>
 
@@ -238,6 +265,7 @@
             <button class="secondary-button" id="downloadPack" type="button" disabled>Download paid pack</button>
           </div>
           <p id="proStatus" class="pro-status" aria-live="polite">Enter a valid code to unlock a paid study pack.</p>
+          <p id="paymentStatus" class="pro-status" aria-live="polite">Complete the current original concept check and source-reviewed study plan before payment links become available.</p>
           <p class="activation-help">After payment, enter the AP- or AR- activation code here. If you used a PayPal fallback, <a href="/support.html">open support</a> with the receipt.</p>
         </div>
       </section>
