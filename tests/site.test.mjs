@@ -103,6 +103,7 @@ test("ships the study diagnostic and launch offers", async () => {
   assert.match(html, /id="checkoutReview"[^>]*aria-disabled="true"/);
   assert.match(html, /AP- or AR-/);
   assert.match(html, /id="downloadPack"[^>]*disabled/);
+  assert.match(html, /Email de-identified summary/);
   assert.match(html, /id="officialSource"[^>]*type="url"[^>]*required/);
   assert.match(html, /id="sourceCheckedDate"[^>]*required/);
   assert.match(html, /id="studyReviewer"[^>]*required/);
@@ -155,6 +156,12 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*examDate/i);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*domain/i);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*lastPlanText/i);
+  assert.match(app, /function approvedSupportSummary/);
+  assert.match(app, /Low-confidence domain count: \$\{scores\.filter/);
+  assert.match(app, /Original concept checks completed: \$\{answeredQuestions\}\/\$\{questions\.length\}/);
+  const summaryFunction = app.match(/function approvedSupportSummary[\s\S]*?\n\}/)?.[0] || "";
+  assert.doesNotMatch(summaryFunction, /lastPlanText|officialSource|studyReviewer|reviewNotes|mentorReviewScope|correctAnswers/);
+  assert.doesNotMatch(app, /body=\$\{encodeURIComponent\(lastPlanText\)\}/);
 });
 
 test("generates policy, discovery, and SEO pages", async () => {
@@ -169,6 +176,8 @@ test("generates policy, discovery, and SEO pages", async () => {
   assert.match(robots, /Sitemap:/);
   assert.match(support, /Prepare the free study plan before payment/);
   assert.match(support, /specific mentor-review scope/);
+  assert.match(support, /with only the target month, weekly study hours, low-confidence domain count/i);
+  assert.match(support, /Do not email the exact exam date, domain names, answers, scores, official-source URL, reviewer identity, review notes, mentor scope/i);
   assert.doesNotMatch(support, /namebatch\.pagecheckai\.com\/api\/checkout|paypal\.com\/ncp\/payment/);
 });
 

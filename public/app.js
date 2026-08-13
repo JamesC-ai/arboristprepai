@@ -198,6 +198,23 @@ function compact(value, fallback) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, 260) || fallback;
 }
 
+function approvedSupportSummary() {
+  const scores = domainScores();
+  const sourceCheckedDate = document.querySelector("#sourceCheckedDate").value;
+  return [
+    "ArboristPrepAI de-identified support summary",
+    "",
+    `Target month: ${examDate.value.slice(0, 7)}`,
+    `Weekly study hours: ${Number(weeklyHours.value)}`,
+    `Low-confidence domain count: ${scores.filter((item) => item.score <= 2).length}`,
+    `Original concept checks completed: ${answeredQuestions}/${questions.length}`,
+    `Official source review date: ${sourceCheckedDate}`,
+    "Current study plan: ready in the learner's browser",
+    "",
+    "Excluded: exact exam date, domain names, answers, scores, official-source URL, reviewer identity, review notes, mentor scope, and the full generated plan.",
+  ].join("\n");
+}
+
 function renderQuestion() {
   const question = questions[currentQuestion];
   quizProgress.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
@@ -282,7 +299,7 @@ function buildPlan() {
     "",
     "Independent practice only. Verify current requirements and technical guidance with official sources.",
   ].join("\n");
-  emailPlan.href = `mailto:support@pagecheckai.com?subject=${encodeURIComponent("ArboristPrepAI plan")}&body=${encodeURIComponent(lastPlanText)}`;
+  emailPlan.href = `mailto:support@pagecheckai.com?subject=${encodeURIComponent("ArboristPrepAI support summary")}&body=${encodeURIComponent(approvedSupportSummary())}`;
   emailPlan.setAttribute("aria-disabled", "false");
   copyPlan.disabled = false;
   downloadPlan.disabled = false;
