@@ -449,11 +449,14 @@ async function verifyPaidPackCode(rawCode, { quiet = false } = {}) {
   const selected = productForCode(code);
   activatePack.disabled = true;
   if (!quiet) proStatus.textContent = "Checking activation code...";
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
   try {
     const response = await fetch(LICENSE_VERIFY_URL, {
       body: JSON.stringify({ code, product: selected.product }),
       headers: { "content-type": "application/json" },
       method: "POST",
+      signal: controller.signal,
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || result.valid !== true || result.entitlement !== selected.entitlement) {
@@ -467,9 +470,10 @@ async function verifyPaidPackCode(rawCode, { quiet = false } = {}) {
     setPaidPackActive(true, `${label} unlocked on this browser.`, selected.entitlement);
     return true;
   } catch {
-    setPaidPackActive(false, "Activation is temporarily unavailable. Your diagnostic stays on this device.");
+    setPaidPackActive(false, "Activation timed out or is temporarily unavailable. Your diagnostic stays on this device; retry shortly.");
     return false;
   } finally {
+    window.clearTimeout(timeout);
     activatePack.disabled = false;
   }
 }
@@ -567,11 +571,19 @@ copyPlan.addEventListener("click", async () => {
     planForm.reportValidity();
     return;
   }
-  await navigator.clipboard.writeText(lastPlanText);
-  copyPlan.textContent = "Copied";
-  setTimeout(() => {
-    copyPlan.textContent = "Copy plan";
-  }, 1200);
+  copyPlan.disabled = true;
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+    await navigator.clipboard.writeText(lastPlanText);
+    copyPlan.textContent = "Copied";
+    window.setTimeout(() => {
+      copyPlan.textContent = "Copy plan";
+    }, 1200);
+  } catch {
+    copyPlan.textContent = "Copy failed - retry";
+  } finally {
+    copyPlan.disabled = !currentStudyReady;
+  }
 });
 
 downloadPlan.addEventListener("click", () => {

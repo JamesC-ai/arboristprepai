@@ -141,6 +141,9 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.doesNotMatch(app, /currentQuestion = \(currentQuestion \+ 1\) % questions\.length/);
   assert.doesNotMatch(app, /answeredQuestions \? correctAnswers \/ answeredQuestions : 0\.5/);
   assert.match(app, /navigator\.clipboard/);
+  assert.match(app, /if \(!navigator\.clipboard\?\.writeText\) throw new Error\("Clipboard unavailable"\)/);
+  assert.match(app, /Copy failed - retry/);
+  assert.match(app, /copyPlan\.disabled = !currentStudyReady/);
   assert.match(app, /function paidPackText/);
   assert.match(app, /ArboristPrepAI Study Sprint Pack/);
   assert.match(app, /READINESS REVIEW PACK/);
@@ -153,6 +156,11 @@ test("runs locally without transmitting diagnostic answers", async () => {
   assert.match(app, /started \? "Download started" : "Retry download"/);
   assert.doesNotMatch(app, /link\.remove\(\);\s*URL\.revokeObjectURL\(url\);/);
   assert.match(app, /JSON\.stringify\(\{ code, product: selected\.product \}\)/);
+  assert.match(app, /new AbortController\(\)/);
+  assert.match(app, /controller\.abort\(\), 10000/);
+  assert.match(app, /signal: controller\.signal/);
+  assert.match(app, /window\.clearTimeout\(timeout\)/);
+  assert.match(app, /Activation timed out or is temporarily unavailable/);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*examDate/i);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*domain/i);
   assert.doesNotMatch(app, /JSON\.stringify\(\{[^}]*lastPlanText/i);
